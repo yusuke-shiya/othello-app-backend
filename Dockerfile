@@ -1,4 +1,3 @@
-
 # DockerHubから軽量のalpineイメージを選択する
 FROM ruby:2.7.5-alpine
 
