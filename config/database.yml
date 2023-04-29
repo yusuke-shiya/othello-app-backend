@@ -13,3 +13,6 @@ default: &default
 development:
   <<: *default
   database: othello_app_development
+test:
+  <<: *default
+  database: othello_app_test
