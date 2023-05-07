@@ -9,7 +9,14 @@ class BattleRoomChannel < ApplicationCable::Channel
     return reject unless can_join_room?
 
     stream_from "battle_room_channel_#{@room_id}"
+
+    # 接続したプレイヤーがどちらの手番かを送信
+    transmit({ myColor: @player[:color] })
+    # ルームの状態を更新
     update_room_state
+    battle_status = room_states[@room_id].count == 2 ? 'playing' : 'waiting'
+    ActionCable.server.broadcast("battle_room_channel_#{@room_id}",
+                                 { battleStatus: battle_status })
   end
 
   def unsubscribed
@@ -37,11 +44,5 @@ class BattleRoomChannel < ApplicationCable::Channel
     players << @player
     logger.debug(players)
     room_states[@room_id] = players
-
-    if players.count == 1
-      ActionCable.server.broadcast("battle_room_channel_#{@room_id}", { battleStatus: 'waiting' })
-    elsif players.count == 2
-      ActionCable.server.broadcast("battle_room_channel_#{@room_id}", { battleStatus: 'playing' })
-    end
   end
 end
